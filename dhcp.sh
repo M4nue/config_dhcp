@@ -6,3 +6,10 @@
 
 #ZONA DECLARACIÓN DE FUNCIONES
 
+#Insertar funcion f_soy_root
+
+
+#Insertar funcion f_paquete_instalado
+
+
+#Insertar funcion f_conexion_internet
