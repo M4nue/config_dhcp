@@ -3,7 +3,7 @@
 #Fecha creación: 2025-03-31
 #Descripcion del script:Instalación y configura un servidor dhcp
 #ZONA DECLARACIÓN DE VARIABLES
-
+v_paquete_dhcp="isc-dhcp-server"
 #ZONA DECLARACIÓN DE FUNCIONES
 
 #Insertar funcion f_soy_root
