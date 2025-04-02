@@ -18,7 +18,22 @@ function f_soyroot1(){
 }
 
 #Insertar funcion f_paquete_instalado
+f_instalado2(){
+  if [[ -z f_buscar_paquete ]]; then
+    return 0
+  else
+    read -p "¿Quiere instalar $paquete ?" opcion
+      if [[ $opcion=="yes" ]] && f_actualiza  ;then
 
+        sudo apt install -y $paquete
+      else
+        echo "Hasta luego"
+        return 1
+      fi
+    echo "Paquete no instalado"
+  fi
+}
+#-----
 
 #Insertar funcion f_conexion_internet
 
