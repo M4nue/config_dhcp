@@ -8,8 +8,27 @@ v_paquete_dhcp="isc-dhcp-server"
 
 #Insertar funcion f_soy_root
 
+function f_soyroot1(){
+
+        if [[ $UID -eq 0 ]] ;then
+                return 0
+        else
+                return 1
+        fi
+}
 
 #Insertar funcion f_paquete_instalado
 
 
 #Insertar funcion f_conexion_internet
+
+function f_conexion_internet(){
+
+        local conexion="8.8.8.8"
+
+        if [[ $(ping -c 2 $conexion) ]] ;then
+                return 0
+        else
+                return 1
+        fi
+}
