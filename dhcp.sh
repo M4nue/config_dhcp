@@ -28,7 +28,7 @@ f_instalado2(){
     return 0
   else
     read -p "¿Quiere instalar $paquete? (yes/no): " opcion
-    if [[ "$opcion" == "yes" || "$opcion" == "y"]]; then
+    if [[ "$opcion" == "yes" || "$opcion" == "y" ]]; then
       if f_soy_root && f_hay_conexion; then
         apt install -y "$paquete"
       else
@@ -95,11 +95,20 @@ f_validar_tiempo(){
   fi
 }
 
+#f_escribir_cambios(){
+#
+#}
+
+#f_anexar_datos(){
+#
+#}
 
 
-while getopts "hf:l:sn:t:T:" opcion; do
+while getopts ":hf:d:l:sn:t:T:" opcion; do
+#  echo -e "numeros de argumentos: $# \n valores de los argumentos: $*"
   case $opcion in
     h)echo "Mostrar función de ayuda"
+      #echo "Opcion h: $OPTIND" con la variable $OPTIND veremos cual es la siguiente opcion que se ejecutara
 ;;
     d)echo "Indicar los DNS en la configuracion"
       f_validar_ip $OPTARG
@@ -120,9 +129,13 @@ while getopts "hf:l:sn:t:T:" opcion; do
       f_validar_tiempo $OPTARG
 ;;
     T)echo "Tiempo maximo permitido de concesion de una ip"
-       f_validar_tiempo $OPTARG
+      f_validar_tiempo $OPTARG
+;;
+    :)echo "Error en la opcion $OPTARG se necesita de argumento"
+      #FUNCION DE AYUDA
 ;;
     ?)echo "Error en la sintaxis del comando, revisa la ayuda"
+      #FUNCION DE AYUDA
 ;;
   esac
 done
