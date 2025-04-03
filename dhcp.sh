@@ -19,20 +19,28 @@ function f_soyroot1(){
 
 #Insertar funcion f_paquete_instalado
 f_instalado2(){
-  if [[ -z f_buscar_paquete ]]; then
+  read -p "Introduce el nombre del paquete" paquete
+
+  if f_buscar_paquete "paquete"; then
+    echo "El paquete ya está instalado."
     return 0
   else
-    read -p "¿Quiere instalar $paquete ?" opcion
-      if [[ $opcion=="yes" ]] && f_actualiza  ;then
-
-        sudo apt install -y $paquete
+    read -p "¿Quiere instalar $paquete? (yes/no): " opcion
+    if [[ "$opcion" == "yes" ]]; then
+      if f_hay_conexion; then
+        echo "Conexión a internet detectada. Instalando $paquete..."
+        sudo apt install -y "$paquete"
       else
-        echo "Hasta luego"
+        echo "No tienes acceso a internet. No se puede instalar el paquete."
         return 1
       fi
-    echo "Paquete no instalado"
+    else
+      echo "Instalación cancelada."
+      return 1
+    fi
   fi
 }
+
 #-----
 
 #Insertar funcion f_conexion_internet
