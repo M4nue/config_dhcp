@@ -28,7 +28,7 @@ f_instalado2(){
     return 0
   else
     read -p "¿Quiere instalar $paquete? (yes/no): " opcion
-    if [[ "$opcion" == "yes" ]]; then
+    if [[ "$opcion" == "yes" || "$opcion" == "y"]]; then
       if f_soy_root && f_hay_conexion; then
         apt install -y "$paquete"
       else
@@ -94,6 +94,8 @@ f_validar_tiempo(){
     return 1
   fi
 }
+
+
 
 while getopts "hf:l:sn:t:T:" opcion; do
   case $opcion in
