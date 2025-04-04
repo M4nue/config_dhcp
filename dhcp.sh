@@ -140,5 +140,13 @@ while getopts ":hf:d:l:sn:t:T:" opcion; do
   esac
 done
 
+f_ayuda(){
+echo -e "Estructura : bash $0 argumentos \n"
+echo -e "Descripcion : script para configuracion basica de servidor DHCP \n"
+echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango \n -n \t Mascara de red \n -s \t Muestra la configuracion actual \n -h \t Muestra la ayuda \n -d \t Indicar los DNS \n -t \t Indica el tiempo por defecto de la concepcion de la ip \n -T \t Tiempo maximo permitido de concepcion de una ip"
+}
+
+
+
 
 
