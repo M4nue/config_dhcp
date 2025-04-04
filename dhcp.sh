@@ -95,6 +95,13 @@ f_validar_tiempo(){
   fi
 }
 
+
+f_ayuda(){
+echo -e "Estructura : bash $0 argumentos \n"
+echo -e "Descripcion : script para configuracion basica de servidor DHCP \n"
+echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango \n -n \t Mascara de red \n -s \t Muestra la configuracion actual \n -h \t Muestra la ayuda \n -d \t Indicar los DNS \n -t \t Indica el tiempo por defecto de la concepcion de la ip \n -T \t Tiempo maximo permitido de concepcion de una ip"
+}
+
 #f_escribir_cambios(){
 #
 #}
@@ -108,6 +115,7 @@ while getopts ":hf:d:l:sn:t:T:" opcion; do
 #  echo -e "numeros de argumentos: $# \n valores de los argumentos: $*"
   case $opcion in
     h)echo "Mostrar función de ayuda"
+      f_ayuda
       #echo "Opcion h: $OPTIND" con la variable $OPTIND veremos cual es la siguiente opcion que se ejecutara
 ;;
     d)echo "Indicar los DNS en la configuracion"
@@ -132,19 +140,14 @@ while getopts ":hf:d:l:sn:t:T:" opcion; do
       f_validar_tiempo $OPTARG
 ;;
     :)echo "Error en la opcion $OPTARG se necesita de argumento"
-      #FUNCION DE AYUDA
+      f_ayuda
 ;;
     ?)echo "Error en la sintaxis del comando, revisa la ayuda"
-      #FUNCION DE AYUDA
+      f_ayuda
 ;;
   esac
 done
 
-f_ayuda(){
-echo -e "Estructura : bash $0 argumentos \n"
-echo -e "Descripcion : script para configuracion basica de servidor DHCP \n"
-echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango \n -n \t Mascara de red \n -s \t Muestra la configuracion actual \n -h \t Muestra la ayuda \n -d \t Indicar los DNS \n -t \t Indica el tiempo por defecto de la concepcion de la ip \n -T \t Tiempo maximo permitido de concepcion de una ip"
-}
 
 
 
