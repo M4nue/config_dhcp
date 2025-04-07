@@ -87,11 +87,12 @@ f_validar_red(){
 }
 
 f_mostrar_configuracion(){
-  if [[ $(cat /etc/dhcpd.conf | grep -Ev "^#|^$") ]]; then
-    return 0
-  else
-    echo "Fallo al encontrar el archivo"
-    return 1
+  if f_archivo_conf; then
+    if [[ $(cat /etc/dhcp/dhcpd.conf | grep -Ev "^#|^$") ]]; then
+      return 0
+    else
+      return 1
+    fi
   fi
 }
 
@@ -112,18 +113,23 @@ echo -e "Descripcion : script para configuracion basica de servidor DHCP \n"
 echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango \n -n \t Mascara de red \n -s \t Muestra la configuracion actual \n -h \t Muestra la ayuda \n -d \t Indicar los DNS \n -t \t Indica el tiempo por defecto de la concepcion de la ip \n -T \t Tiempo maximo permitido de concepcion de una ip"
 }
 
-#f_escribir_cambios(){
-#
-#}
+f_archivo_conf(){
+  if [ -e "/etc/dhcp/dhcpd.conf" ]; then
+    return 0
+  else
+    echo "El fichero de configuracion no existe"
+    return 1
+}
 
 f_anexo_datos() {
+  if f_archivo_conf; then
   echo -e "subnet $subnet netmask $network {
 \trange $first_ip $last_ip;
 \toption routers $router;
 \toption broadcast-address $broadcast;
 }"
 }
-
+  fi
 
 while getopts ":hb:f:d:l:sS:n:t:T:r:" opcion; do
 #  echo -e "numeros de argumentos: $# \n valores de los argumentos: $*"
@@ -215,9 +221,9 @@ else
           exit 1
         else
           if [[ $dns != false || $default_time != false || $max_time != false ]]; then
-            [[ $dns != false ]] && echo "option domain-name-servers $dns;"
-	    [[ $default_time != false ]] && echo "default-lease-time $default_time;"
-	    [[ $max_time != false ]] && echo "max-lease-time $max_time;"
+            [[ $dns != false ]]  &&  sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;"
+	    [[ $default_time != false ]] && $(sed -i "s/default-lease-time [0-9]*/default-lease-time $default_time/" /etc/dhcp/dhcpd.conf)
+	    [[ $max_time != false ]] && $(sed -i "s/max-lease-time [0-9]*/max-lease-time $max_time/" /etc/dhcp/dhcpd.conf)
             f_anexo_datos
 	  else
 	    f_anexo_datos
