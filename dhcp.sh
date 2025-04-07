@@ -127,7 +127,7 @@ f_anexo_datos() {
 \trange $first_ip $last_ip;
 \toption routers $router;
 \toption broadcast-address $broadcast;
-}"
+}">>/etc/dhcp/dhcpd.conf
 }
   fi
 
