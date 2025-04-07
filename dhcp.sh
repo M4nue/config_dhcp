@@ -5,11 +5,21 @@
 #Descripcion del script:Instalación y configura un servidor dhcp
 
 #ZONA DECLARACIÓN DE VARIABLES
+
 paquete="isc-dhcp-server"
 #Expresión regular para identificar si una cadena de caracteres es una IP
 regexp_ip="^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$"
-#Expresión regular confirmar tiempo
-regexp_tiempo="^[1-9][0-9]*$"
+regexp_tiempo="^[1-9][0-9]*$" #Expresión regular confirmar tiempo
+
+subnet=false
+broadcast=false
+network=false
+first_ip=false
+last_ip=false
+router=false
+dns=false
+default_time=false
+max_time=false
 
 
 #ZONA DECLARACIÓN DE FUNCIONES
@@ -106,12 +116,16 @@ echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango 
 #
 #}
 
-#f_anexar_datos(){
-#
-#}
+f_anexo_datos() {
+  echo -e "subnet $subnet netmask $network {
+\trange $first_ip $last_ip;
+\toption routers $router;
+\toption broadcast-address $broadcast;
+}"
+}
 
 
-while getopts ":hf:d:l:sn:t:T:" opcion; do
+while getopts ":hb:f:d:l:sS:n:t:T:r:" opcion; do
 #  echo -e "numeros de argumentos: $# \n valores de los argumentos: $*"
   case $opcion in
     h)echo "Mostrar función de ayuda"
@@ -119,37 +133,97 @@ while getopts ":hf:d:l:sn:t:T:" opcion; do
       #echo "Opcion h: $OPTIND" con la variable $OPTIND veremos cual es la siguiente opcion que se ejecutara
 ;;
     d)echo "Indicar los DNS en la configuracion"
-      f_validar_ip $OPTARG
+      if f_validar_ip $OPTARG; then
+        dns=$OPTARG
+      fi
 ;;
     f)echo "la opción f de first (primera) $opcion cuenta con la primera ip la $OPTARG"
-      f_validar_ip $OPTARG
+      if f_validar_ip $OPTARG; then
+        first_ip=$OPTARG
+      fi
 ;;
     l)echo "la opcion l de lasted (ultima) $opcion cuenta con la ultima ip $OPTARG"
-      f_validar_ip $OPTARG
+      if f_validar_ip $OPTARG; then
+        last_ip=$OPTARG
+      fi
 ;;
     s)echo "Opción s de show muestra configuración actual" 
       f_mostrar_configuracion
 ;;
     n)echo "Opción n de network, se espera parsar una mascara de red en hexadecimal(255.255.255.255)"
-      f_validar_red $OPTARG
+      if f_validar_red $OPTARG; then
+        network=$OPTARG
+      fi
 ;;
     t)echo "Tiempo por defecto de la concesion de ip en segundos"
-      f_validar_tiempo $OPTARG
+      if f_validar_tiempo $OPTARG; then
+        default_time=$OPTARG
+      fi
 ;;
     T)echo "Tiempo maximo permitido de concesion de una ip"
-      f_validar_tiempo $OPTARG
+      if f_validar_tiempo $OPTARG; then
+        max_time=$OPTARG
+      fi
+;;
+    S)echo "La subnet es $OPTARG"
+      if f_validar_ip $OPTARG; then
+        subnet=$OPTARG
+      fi
+;;
+    b)echo "La direccion de broadcast es $OPTARG"
+      if f_validar_ip $OPTARG; then
+        broadcast=$OPTARG
+      fi
+;;
+    r) echo "El router por defecto para el dhcp es $OPTARG"
+      if f_validar_ip $OPTARG; then
+        router=$OPTARG
+      fi
 ;;
     :)echo "Error en la opcion $OPTARG se necesita de argumento"
-      f_ayuda
+      #f_ayuda
 ;;
     ?)echo "Error en la sintaxis del comando, revisa la ayuda"
-      f_ayuda
+      #f_ayuda
 ;;
   esac
 done
 
-
-
-
-
-
+if [[ $subnet == false ]]; then
+  echo "La ip de red no esta indicada"
+  f_ayuda
+  exit 1
+else
+  if [[ $network == false ]]; then
+    echo "La mascara de red no esta indicada"
+    f_ayuda
+    exit 1
+  else
+    if [[ $first_ip == false || $last_ip == false ]]; then
+      echo "La primera o ultima ip del rango no estan indicada"
+      f_ayuda
+      exit 1
+    else
+      if [[ $broadcast == false ]]; then
+        echo "La direccion de broadcast no esta especificada"
+        f_ayuda
+        exit 1
+      else
+        if [[ $router == false ]]; then
+          echo "El router por defecto no ha sido indicado"
+          f_ayuda
+          exit 1
+        else
+          if [[ $dns != false || $default_time != false || $max_time != false ]]; then
+            [[ $dns != false ]] && echo "option domain-name-servers $dns;"
+	    [[ $default_time != false ]] && echo "default-lease-time $default_time;"
+	    [[ $max_time != false ]] && echo "max-lease-time $max_time;"
+            f_anexo_datos
+	  else
+	    f_anexo_datos
+          fi
+        fi
+      fi
+    fi
+  fi
+fi
