@@ -39,7 +39,7 @@ f_instalado2(){
   else
     read -p "¿Quiere instalar $paquete? (yes/no): " opcion
     if [[ "$opcion" == "yes" || "$opcion" == "y" ]]; then
-      if f_soy_root && f_hay_conexion; then
+      if f_hay_conexion; then
         apt install -y "$paquete"
       else
         return 1
@@ -119,6 +119,7 @@ f_archivo_conf(){
   else
     echo "El fichero de configuracion no existe"
     return 1
+  fi
 }
 
 f_anexo_datos() {
@@ -128,8 +129,10 @@ f_anexo_datos() {
 \toption routers $router;
 \toption broadcast-address $broadcast;
 }">>/etc/dhcp/dhcpd.conf
-}
   fi
+}
+
+
 
 while getopts ":hb:f:d:l:sS:n:t:T:r:" opcion; do
 #  echo -e "numeros de argumentos: $# \n valores de los argumentos: $*"
@@ -187,49 +190,57 @@ while getopts ":hb:f:d:l:sS:n:t:T:r:" opcion; do
       fi
 ;;
     :)echo "Error en la opcion $OPTARG se necesita de argumento"
-      #f_ayuda
+
 ;;
     ?)echo "Error en la sintaxis del comando, revisa la ayuda"
-      #f_ayuda
 ;;
   esac
 done
 
-if [[ $subnet == false ]]; then
-  echo "La ip de red no esta indicada"
-  f_ayuda
-  exit 1
-else
-  if [[ $network == false ]]; then
-    echo "La mascara de red no esta indicada"
-    f_ayuda
-    exit 1
-  else
-    if [[ $first_ip == false || $last_ip == false ]]; then
-      echo "La primera o ultima ip del rango no estan indicada"
+
+if f_archivo_conf && f_soy_root; then 
+  if f_instalado2; then
+    if [[ $subnet == false ]]; then
+      echo "La ip de red no esta indicada"
       f_ayuda
-      exit 1
+      return 1
     else
-      if [[ $broadcast == false ]]; then
-        echo "La direccion de broadcast no esta especificada"
+      if [[ $network == false ]]; then
+        echo "La mascara de red no esta indicada"
         f_ayuda
-        exit 1
+        return 1
       else
-        if [[ $router == false ]]; then
-          echo "El router por defecto no ha sido indicado"
+        if [[ $first_ip == false || $last_ip == false ]]; then
+          echo "La primera o ultima ip del rango no estan indicada"
           f_ayuda
-          exit 1
+          return 1
         else
-          if [[ $dns != false || $default_time != false || $max_time != false ]]; then
-            [[ $dns != false ]]  &&  sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;"
-	    [[ $default_time != false ]] && $(sed -i "s/default-lease-time [0-9]*/default-lease-time $default_time/" /etc/dhcp/dhcpd.conf)
-	    [[ $max_time != false ]] && $(sed -i "s/max-lease-time [0-9]*/max-lease-time $max_time/" /etc/dhcp/dhcpd.conf)
-            f_anexo_datos
-	  else
-	    f_anexo_datos
+          if [[ $broadcast == false ]]; then
+            echo "La direccion de broadcast no esta especificada"
+            f_ayuda
+            return 1
+          else
+            if [[ $router == false ]]; then
+              echo "El router por defecto no ha sido indicado"
+              f_ayuda
+              return 1
+            else
+              if [[ $dns != false || $default_time != false || $max_time != false ]]; then
+                [[ $dns != false ]]  &&  sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;"
+          [[ $default_time != false ]] && $(sed -i "s/default-lease-time [0-9]*/default-lease-time $default_time/" /etc/dhcp/dhcpd.conf)
+          [[ $max_time != false ]] && $(sed -i "s/max-lease-time [0-9]*/max-lease-time $max_time/" /etc/dhcp/dhcpd.conf)
+                f_anexo_datos
+        else
+          f_anexo_datos
+              fi
+            fi
           fi
         fi
       fi
     fi
   fi
+  return 1
+else
+  echo "no hay archivo de configuracion"
+  return 1
 fi
