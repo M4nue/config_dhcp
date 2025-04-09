@@ -125,6 +125,8 @@ echo -e "Opciones:\n\
 -S \t Indica la subnet"
 }
 
+echo"bash dhcp.sh -S ip -n Mascara de red -b ip broadcast -r ip -f ip -l ip [argumentos]
+
 f_archivo_conf(){
   if [ -e "/etc/dhcp/dhcpd.conf" ]; then
     return 0
