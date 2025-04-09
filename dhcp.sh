@@ -108,9 +108,21 @@ f_validar_tiempo(){
 
 
 f_ayuda(){
-echo -e "Estructura : bash $0 argumentos \n"
+echo -e "Estructura : bash $0 opciones \n"
 echo -e "Descripcion : script para configuracion basica de servidor DHCP \n"
-echo -e "Opciones: \n\n -f \t Primera ip del rango \n -l \t Ultima ip del rango \n -n \t Mascara de red \n -s \t Muestra la configuracion actual \n -h \t Muestra la ayuda \n -d \t Indicar los DNS \n -t \t Indica el tiempo por defecto de la concepcion de la ip \n -T \t Tiempo maximo permitido de concepcion de una ip"
+echo -e "Opciones:\n\
+\n\
+-f \t Primera ip del rango\n\
+-l \t Ultima ip del rango\n\
+-n \t Mascara de red\n\
+-s \t Muestra la configuracion actual\n\
+-h \t Muestra la ayuda\n\
+-d \t Indicar los DNS\n\
+-t \t Indica el tiempo por defecto de la concepcion de la ip\n\
+-T \t Tiempo maximo permitido de concepcion de una ip\n\
+-r \t Router por defecto\n\
+-b \t Direccion de broadcast\n\
+-S \t Indica la subnet"
 }
 
 f_archivo_conf(){
@@ -241,6 +253,5 @@ if f_archivo_conf && f_soy_root; then
   fi
   return 1
 else
-  echo "no hay archivo de configuracion"
-  return 1
+  f_ayuda
 fi
