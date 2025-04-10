@@ -7,7 +7,7 @@ if [ "$EUID" -ne 0 ]; then
 else
   # Verificar e instalar parted si no está presente
 
-  if ! command -v parted >/dev/null 2>&1; then
+  if ! command -v /usr/sbin/parted >/dev/null 2>&1; then
     echo "parted no está instalado. Instalándolo..."
     apt update
     apt install parted -y
@@ -50,7 +50,7 @@ else
     echo "Disco seleccionado: $DISCO"
 
     # Verificar que ambos estén instalados antes de continuar
-    if command -v parted >/dev/null 2>&1 && command -v bc >/dev/null 2>&1; then
+    if command -v /usr/sbin/parted >/dev/null 2>&1 && command -v bc >/dev/null 2>&1; then
       # Advertencia al usuario
       echo "Esto eliminará todos los datos en $DISCO y emzará a particionarse, ¿ quieres continuar? (s/n)"
       read respuesta
@@ -75,11 +75,11 @@ else
           FIN=$(( i * TAMANIO_PARTICION ))
   
           echo "Creando partición $i: de ${INICIO}MB a ${FIN}MB"
-          parted -s "$DISCO" mkpart primary ${INICIO}MB ${FIN}MB
+          /usr/sbin/parted -s "$DISCO" mkpart primary ${INICIO}MB ${FIN}MB
         done
 
         echo "Ya esta listo el particionado."
-        parted -s "$DISCO" print
+        /usr/sbin/parted -s "$DISCO" print
 
         echo "Script finalizado"
       fi
