@@ -32,7 +32,7 @@ function f_soy_root(){
 }
 
 f_buscar_paquete() {
-  if $(dpkg -l | grep isc-dhcp-server &>/dev/null); then
+  if $(dpkg -l | grep $1 &>/dev/null); then
     return 0
   else
     return 1
