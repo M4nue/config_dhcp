@@ -26,11 +26,23 @@ max_time=false
 function f_soy_root(){
   if [[ $UID -eq 0 ]] ;then
     return 0
+  else_buscar_paquete(){
+  if [[ witch $1 ]]; then
+    return 0
   else
     return 1
   fi
 }
-
+    return 1
+  fi
+}
+f_buscar_paquete(){
+  if [[ whitch $1 ]]; then
+    return 0
+  else
+    return 1
+  fi
+}
 #Insertar funcion f_paquete_instalado
 f_instalado2(){
   if f_buscar_paquete $paquete; then
