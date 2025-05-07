@@ -225,27 +225,22 @@ if f_archivo_conf && f_soy_root; then
     if [[ $subnet == false ]]; then
       echo "La ip de red no esta indicada"
       f_ayuda
-      return 1
     else
       if [[ $network == false ]]; then
         echo "La mascara de red no esta indicada"
         f_ayuda
-        return 1
       else
         if [[ $first_ip == false || $last_ip == false ]]; then
           echo "La primera o ultima ip del rango no estan indicada"
           f_ayuda
-          return 1
         else
           if [[ $broadcast == false ]]; then
             echo "La direccion de broadcast no esta especificada"
             f_ayuda
-            return 1
           else
             if [[ $router == false ]]; then
               echo "El router por defecto no ha sido indicado"
               f_ayuda
-              return 1
             else
               if [[ $dns != false || $default_time != false || $max_time != false ]]; then
                 [[ $dns != false ]]  &&  sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;"
