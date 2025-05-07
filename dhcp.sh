@@ -47,7 +47,7 @@ f_instalado2(){
   else
     read -p "¿Quiere instalar $paquete? (yes/no): " opcion
     if [[ "$opcion" == "yes" || "$opcion" == "y" ]]; then
-      if f_hay_conexion; then
+      if f_conexion_internet; then
         apt install -y "$paquete"
       else
         return 1
