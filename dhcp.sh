@@ -261,7 +261,6 @@ if f_archivo_conf && f_soy_root; then
       fi
     fi
   fi
-  return 1
 else
   f_ayuda
 fi
