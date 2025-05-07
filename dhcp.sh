@@ -31,13 +31,14 @@ function f_soy_root(){
   fi
 }
 
-f_buscar_paquete(){
-  if [[ whitch $1 ]]; then
+f_buscar_paquete() {
+  if command -v "$1" >/dev/null 2>&1; then
     return 0
   else
     return 1
   fi
 }
+
 #Insertar funcion f_paquete_instalado
 f_instalado2(){
   if f_buscar_paquete $paquete; then
