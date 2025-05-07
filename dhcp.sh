@@ -96,13 +96,13 @@ f_validar_red(){
 
 f_mostrar_configuracion(){
   if f_archivo_conf; then
-    if [[ $(cat /etc/dhcp/dhcpd.conf | grep -Ev "^#|^$") ]]; then
+      grep -Ev "^\s*#|^\s*$" /etc/dhcp/dhcpd.conf
       return 0
     else
       return 1
-    fi
   fi
 }
+
 
 f_validar_tiempo(){
   if [[ $1 =~ ($regexp_tiempo) ]]; then
@@ -131,9 +131,14 @@ echo -e "Opciones:\n\
 -r \t Router por defecto\n\
 -b \t Direccion de broadcast\n\
 -S \t Indica la subnet"
+
+echo -e "COMBINACIONES DISPONIBLES:"
+echo -e "bash dhcp.sh -s"
+echo -e "bash dhcp.sh -h"
+echo -e "bash dhcp.sh -f IP -l IP -n MASCARA -r ROUTER POR DEFECTO -b BROADCAST -S SUBNET [-d DNS || -t TIEMP || -T TIEMPO]"
 }
 
-echo "bash dhcp.sh -S ip -n Mascara de red -b ip broadcast -r ip -f ip -l ip [argumentos]"
+
 
 f_archivo_conf(){
   if [ -e "/etc/dhcp/dhcpd.conf" ]; then
@@ -220,42 +225,40 @@ while getopts ":hb:f:d:l:sS:n:t:T:r:" opcion; do
 done
 
 
-if f_archivo_conf && f_soy_root; then 
+
+ARGS_REQUERIDOS=0
+[[ $subnet != false ]] && ((ARGS_REQUERIDOS++))
+[[ $network != false ]] && ((ARGS_REQUERIDOS++))
+[[ $first_ip != false ]] && ((ARGS_REQUERIDOS++))
+[[ $last_ip != false ]] && ((ARGS_REQUERIDOS++))
+[[ $broadcast != false ]] && ((ARGS_REQUERIDOS++))
+[[ $router != false ]] && ((ARGS_REQUERIDOS++))
+
+ARGS_OPCIONALES=0
+[[ $dns != false ]] && ((ARGS_OPCIONALES++))
+[[ $default_time != false ]] && ((ARGS_OPCIONALES++))
+[[ $max_time != false ]] && ((ARGS_OPCIONALES++))
+
+# Combinación válida: ayuda o mostrar configuración
+if [[ $OPTIND -eq 2 && ( $1 == "-h" || $1 == "-s" ) ]]; then
+  exit 0
+fi
+
+# Combinación válida: 6 argumentos requeridos + máximo 1 opcional
+if [[ $ARGS_REQUERIDOS -eq 6 && $ARGS_OPCIONALES -le 1 ]]; then
   if f_instalado2; then
-    if [[ $subnet == false ]]; then
-      echo "La ip de red no esta indicada"
-      f_ayuda
-    else
-      if [[ $network == false ]]; then
-        echo "La mascara de red no esta indicada"
-        f_ayuda
-      else
-        if [[ $first_ip == false || $last_ip == false ]]; then
-          echo "La primera o ultima ip del rango no estan indicada"
-          f_ayuda
-        else
-          if [[ $broadcast == false ]]; then
-            echo "La direccion de broadcast no esta especificada"
-            f_ayuda
-          else
-            if [[ $router == false ]]; then
-              echo "El router por defecto no ha sido indicado"
-              f_ayuda
-            else
-              if [[ $dns != false || $default_time != false || $max_time != false ]]; then
-                [[ $dns != false ]]  &&  sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;"
-          [[ $default_time != false ]] && $(sed -i "s/default-lease-time [0-9]*/default-lease-time $default_time/" /etc/dhcp/dhcpd.conf)
-          [[ $max_time != false ]] && $(sed -i "s/max-lease-time [0-9]*/max-lease-time $max_time/" /etc/dhcp/dhcpd.conf)
-                f_anexo_datos
-        else
-          f_anexo_datos
-              fi
-            fi
-          fi
-        fi
-      fi
-    fi
+    [[ $dns != false ]] && sed -i "s/option domain-name-servers *;/option domain-name-servers $dns;/" /etc/dhcp/dhcpd.conf
+    [[ $default_time != false ]] && sed -i "s/default-lease-time [0-9]*/default-lease-time $default_time/" /etc/dhcp/dhcpd.conf
+    [[ $max_time != false ]] && sed -i "s/max-lease-time [0-9]*/max-lease-time $max_time/" /etc/dhcp/dhcpd.conf
+    f_anexo_datos
+    echo " Configuración completada correctamente."
+    exit 0
+  else
+    echo " No se pudo instalar el paquete $paquete."
+    exit 1
   fi
 else
+  echo -e "\n Combinación de parámetros inválida.\n"
   f_ayuda
+  exit 1
 fi
